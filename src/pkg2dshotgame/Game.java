@@ -12,7 +12,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -24,6 +25,8 @@ public class Game extends BasicGameState{
 
     private static int ID = 1;
     private int globalTime;
+    private int globalScore;
+    private int globalWave;
     private int auxTime;
     //Input
     private Input input;
@@ -36,6 +39,10 @@ public class Game extends BasicGameState{
     private Player p;
     //Enemys
     private ArrayList<Enemy> enemyList;
+    //Bloques de colision
+    private ArrayList<Rectangle> paredes;
+    public ColitionsManager cmP,cmE;
+    private GameContainer gameC;
     @Override
     public int getID() {
         return ID;
@@ -45,22 +52,35 @@ public class Game extends BasicGameState{
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         p = new Player(500,400,20,20,1);
         enemyList = new ArrayList<>();
+        gameC = gc;
         for (int i = 0; i < 1; i++) {
             enemyList.add(new Enemy(100,100,20,20,3));
         }
         input = gc.getInput();
-        globalTime = 0;
+        globalTime = globalScore = globalWave = 0;
         auxTime = auxMb1 = auxMb2 = 0;
         auxDebug = false;
+        paredes = new ArrayList();
+        paredes.add(new Rectangle(0,0,Main.SCREEN_X,10));
+        paredes.add(new Rectangle(0,0,10,Main.SCREEN_Y));
+        paredes.add(new Rectangle(0,Main.SCREEN_Y - 10,Main.SCREEN_X,10));
+        paredes.add(new Rectangle(Main.SCREEN_X - 10,0,10,Main.SCREEN_Y));
+        paredes.add(new Rectangle(200,300,400,20));
         shotDelay = 300; // In MilliSeconds
         gc.setMouseCursor("Assets/Cursor.png", 1, 1 );
         gc.setVSync(true);
+        cmP = new ColitionsManager();
+        cmE = new ColitionsManager();
     }
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
         this.renderMap(g);
-        if(auxDebug) this.renderDebug(gc,g);
+        if(auxDebug){
+            this.renderDebug(gc,g);
+        }else{
+            this.renderHUD(g);
+        }
         this.renderBullets(g);
         p.render(g);
         enemyList.get(0).render(g);
@@ -83,8 +103,18 @@ public class Game extends BasicGameState{
         g.drawString("Px: "+p.getX()+"\nPy: "+p.getY(), 10, 120);
         //Figuras Geometricas y Lineas
     }
+    private void renderHUD(Graphics g){
+        g.setColor(Color.white);
+        String auxS = "Hp: "+p.getHealth()+"\nBalas: "+p.getBullets().size()+"\nScore: "+p.getScore()+"\n";
+        auxS += "Wave: "+globalWave;
+        g.drawString(auxS, 10, 10);
+    }
     private void renderMap(Graphics g){
         g.setBackground(Color.black);
+        g.setColor(Color.darkGray);
+        for (int i = 0; i < paredes.size(); i++) {
+            g.fill((Shape) paredes.get(i));
+        }
     }
     private void renderBullets(Graphics g){
         int auxBalas = p.getBullets().size();
@@ -122,11 +152,54 @@ public class Game extends BasicGameState{
     private void updateEntityColitions(){
         for (int i = 0; i < p.getBullets().size(); i++) {
             Bullet auxB = p.getBullets().get(i);
-            if(auxB.isActive() && ColitionsManager.checkBasicColition(auxB,enemyList.get(0))){
+            if(auxB.isActive() && cmE.checkBasicColition(auxB,enemyList.get(0))){
                 enemyList.get(0).hit(auxB.getDmg());
             } 
         }
+        //Player Colitions
+        this.rigidBodyColitions(p);
+        this.rigidBodyColitions(enemyList.get(0));
     }
+    private void rigidBodyColitions(Enemy e){
+        for (int i = 0; i < paredes.size(); i++) {
+            if(e.intersects(paredes.get(i))){
+                switch(cmE.checkCol(e, paredes.get(i))){
+                    case ColitionsManager.UP:
+                        e.setDir(false, p.DOWN);
+                        break;
+                    case ColitionsManager.DOWN:
+                        e.setDir(false, p.UP);
+                        break;
+                    case ColitionsManager.LEFT:
+                        e.setDir(false, p.RIGHT);
+                        break;
+                    case ColitionsManager.RIGHT:
+                        e.setDir(false, p.LEFT);
+                        break;
+                }
+            }
+        }
+    }
+    private void rigidBodyColitions(Player p){
+        for (int i = 0; i < paredes.size(); i++) {
+            if(p.intersects(paredes.get(i))){
+                switch(cmP.checkCol(p, paredes.get(i))){
+                    case ColitionsManager.UP:
+                        p.setDir(false, p.DOWN);
+                        break;
+                    case ColitionsManager.DOWN:
+                        p.setDir(false, p.UP);
+                        break;
+                    case ColitionsManager.LEFT:
+                        p.setDir(false, p.RIGHT);
+                        break;
+                    case ColitionsManager.RIGHT:
+                        p.setDir(false, p.LEFT);
+                        break;
+                }
+            }
+        }
+    }    
     private void InputManager(int delta){
         //KeyBoard Inputs
         if(input.isKeyDown(Input.KEY_UP)){
@@ -149,8 +222,17 @@ public class Game extends BasicGameState{
         }else{
             p.setDir(false, p.RIGHT);
         }
-        if(input.isKeyDown(Input.KEY_F1)) enemyList.get(0).follow(p);
-        if(input.isKeyPressed(Input.KEY_F5)) auxDebug = !auxDebug;
+        //F's
+        
+        if(input.isKeyDown(Input.KEY_F1)){
+            enemyList.get(0).follow(p);
+        }
+        if(input.isKeyPressed(Input.KEY_F5)){
+            auxDebug = !auxDebug;
+            gameC.setShowFPS(auxDebug);
+        }
+        
+        //
         //Mouse Inputs
         if(Mouse.isButtonDown(0) && auxMb1 == 0){
             System.out.println("Click izq");

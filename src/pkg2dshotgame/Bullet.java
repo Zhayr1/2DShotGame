@@ -25,7 +25,7 @@ public class Bullet extends Entity{
     public Bullet(float x, float y, int width, int height,float bulletSpeed, int ID) {
         super(x, y, width, height, ID);
         rp = xp = yp = theta = 0;
-        dmg = 2;
+        dmg = 1;
         active = false;
         ready = true;
         lifeTime = LIFE_TIME_CONSTANT;

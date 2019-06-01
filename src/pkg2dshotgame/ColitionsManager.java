@@ -5,6 +5,11 @@
  */
 package pkg2dshotgame;
 
+import java.util.ArrayList;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.geom.Point;
+import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
 /**
@@ -13,12 +18,45 @@ import org.newdawn.slick.geom.Shape;
  */
 public class ColitionsManager {
     
-    public ColitionsManager(Shape a, Shape b){
+    public static final int NOCOL = 0;
+    public static final int UP    = 1;
+    public static final int DOWN  = 2;
+    public static final int LEFT  = 3;
+    public static final int RIGHT = 4;
+    
+    public ColitionsManager(){
         
     }
     
-    public static boolean checkBasicColition(Shape a, Shape b){
+    public boolean checkBasicColition(Shape a,Shape b){
         return a.intersects(b);
     }
     
+    public int checkCol(Shape a,Shape b){
+        float ax1,ax2,ay1,ay2,bx1,bx2,by1,by2;
+        //A - player
+        ax1 = a.getX();
+        ax2 = a.getX() + a.getWidth();
+        ay1 = a.getY();
+        ay2 = a.getY() + a.getHeight();
+        //B
+        bx1 = b.getX();
+        bx2 = b.getX() + b.getWidth();
+        by1 = b.getY();
+        by2 = b.getY() + b.getHeight();
+        if( (ax2 > bx1) && (ax1 < bx2) &&( ay2 == by1 || (ay2 <= by1 && ay1 >= by1) ) ){
+            a.setY(ay1 - (ay2 - by1));
+            return UP;
+        }else if( (ax2 > bx1 +5 && ax1 < bx2 -5) && ( ay1 == by2 || (ay1 <= by2 && ay2 >= by2) ) ){
+            a.setY(by2);
+            return DOWN;
+        }else if( ( (ax2 <= bx1 + 5 ) && (ax2 > bx1 ) ) && ay2 >= by1 && ay1 <= by2){
+            a.setX(bx1 - a.getWidth() - 1);
+            return LEFT;
+        }else if( ( (ax1 >= bx2 - 5 ) && (ax1 < bx2 ) ) && ay2 >= by1 && ay1 <= by2 ){
+            a.setX(bx2);
+            return RIGHT;
+        }
+        return NOCOL;
+    }
 }

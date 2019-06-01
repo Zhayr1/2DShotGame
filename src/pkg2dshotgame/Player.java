@@ -23,6 +23,7 @@ public class Player extends Entity{
     public final byte VEL;
     //
     private int health;
+    private int score;
     private List<Bullet> bullets;
     //Variables de movimiento
     private boolean up,down,left,right;
@@ -31,6 +32,8 @@ public class Player extends Entity{
         super(x, y, width, height, ID);
         up = down = left = right = false;
         VEL = 5;
+        health = 10;
+        score = 0;
         bullets = new ArrayList();
         for (int i = 0; i < 10; i++) {
             bullets.add(new Bullet(-500, 0,5,5,1f,0));
@@ -68,8 +71,17 @@ public class Player extends Entity{
                 break;
         }
     }
+    public void addScore(int i){
+        score += i;
+    }
     //Getters
     public List<Bullet> getBullets(){
         return bullets;
+    }
+    public int getHealth(){
+        return health;
+    }
+    public int getScore(){
+        return score;
     }
 }

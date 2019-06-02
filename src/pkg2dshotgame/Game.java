@@ -12,6 +12,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
@@ -37,12 +38,15 @@ public class Game extends BasicGameState{
     private int shotDelay;
     //Player
     private Player p;
+    private int auxGunSize;
+    private Gun auxGun;
     //Enemys
     private ArrayList<Enemy> enemyList;
     //Bloques de colision
     private ArrayList<Rectangle> paredes;
     public ColitionsManager cmP,cmE;
     private GameContainer gameC;
+    private Sound shot9mm,zombieHit;
     @Override
     public int getID() {
         return ID;
@@ -51,6 +55,8 @@ public class Game extends BasicGameState{
     @Override
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         p = new Player(500,400,20,20,1);
+        auxGun = p.getGun();
+        auxGunSize = auxGun.getChargerSize();
         enemyList = new ArrayList<>();
         gameC = gc;
         for (int i = 0; i < 1; i++) {
@@ -71,6 +77,8 @@ public class Game extends BasicGameState{
         gc.setVSync(true);
         cmP = new ColitionsManager();
         cmE = new ColitionsManager();
+        shot9mm = new Sound("Assets/TestAssets/9mmFire.ogg");
+        zombieHit = new Sound("Assets/TestAssets/zombieHit.ogg");
     }
 
     @Override
@@ -105,7 +113,8 @@ public class Game extends BasicGameState{
     }
     private void renderHUD(Graphics g){
         g.setColor(Color.white);
-        String auxS = "Hp: "+p.getHealth()+"\nBalas: "+p.getBullets().size()+"\nScore: "+p.getScore()+"\n";
+        String auxS = "Hp: "+p.getHealth()+"\nBalas: "+auxGun.getCurrentBullets()+"/"+auxGun.getTotalBullets()+
+                      "\nScore: "+p.getScore()+"\n";
         auxS += "Wave: "+globalWave;
         g.drawString(auxS, 10, 10);
     }
@@ -117,10 +126,10 @@ public class Game extends BasicGameState{
         }
     }
     private void renderBullets(Graphics g){
-        int auxBalas = p.getBullets().size();
+        int auxBalas = auxGunSize;
         for (int i = 0; i < auxBalas; i++) {
-            if(p.getBullets().get(i).isActive()){
-                p.getBullets().get(i).render(g);
+            if(auxGun.getBullets().get(i).isActive()){
+                auxGun.getBullets().get(i).render(g);
             }
         }
     }
@@ -130,10 +139,10 @@ public class Game extends BasicGameState{
         //Enemies Movement
         enemyList.get(0).updatePosition(delta);
         //BulletsMovement
-        int auxBalas = p.getBullets().size();
+        int auxBalas = auxGunSize;
         for (int i = 0; i < auxBalas; i++) {
-            if(p.getBullets().get(i).isActive()){
-                p.getBullets().get(i).updatePosition(delta);
+            if(auxGun.getBullets().get(i).isActive()){
+                auxGun.getBullets().get(i).updatePosition(delta);
             }
         }
         //Input Manager
@@ -147,13 +156,15 @@ public class Game extends BasicGameState{
             globalTime++;
         }
         mx = Mouse.getX();
-        my = Math.abs( Mouse.getY() - Main.SCREEN_Y );   
+        my = Math.abs( Mouse.getY() - Main.SCREEN_Y );  
+        auxGun.reloadDelay(delta);
     }
     private void updateEntityColitions(){
-        for (int i = 0; i < p.getBullets().size(); i++) {
-            Bullet auxB = p.getBullets().get(i);
+        for (int i = 0; i < auxGunSize; i++) {
+            Bullet auxB = auxGun.getBullets().get(i);
             if(auxB.isActive() && cmE.checkBasicColition(auxB,enemyList.get(0))){
                 enemyList.get(0).hit(auxB.getDmg());
+                if(enemyList.get(0).isActive()) auxB.setReady();
             } 
         }
         //Player Colitions
@@ -236,10 +247,9 @@ public class Game extends BasicGameState{
         //Mouse Inputs
         if(Mouse.isButtonDown(0) && auxMb1 == 0){
             System.out.println("Click izq");
-            for (int i = 0; i < p.getBullets().size(); i++) {
-                if(p.getBullets().get(i).isReady()){
-                    p.getBullets().get(i).shot((int)p.getX(),(int)p.getY(),mx, my);
-                    System.out.println("Shot: "+(i+1));
+            for (int i = 0; i < auxGunSize; i++) {
+                if(auxGun.getBullets().get(i).isReady()){
+                    p.shot((int)p.getX(),(int)p.getY(),mx, my);
                     break;
                 }
             }

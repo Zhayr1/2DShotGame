@@ -7,6 +7,8 @@ package pkg2dshotgame;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 
 /**
  *
@@ -23,16 +25,18 @@ public class Enemy extends Entity{
     private boolean up,down,left,right;
     private int refreshRate; //In Milliseconds
     private int refreshConstant = 50;
+    private Sound enemyHit;
     //\TEST
     
     private int health;
     private float yp,xp,xe,ye,rp,theta;
     private boolean active;
     private Player targetPlayer;
-    public Enemy(float x, float y, int width, int height, int ID) {
+    public Enemy(float x, float y, int width, int height, int ID) throws SlickException {
         super(x, y, width, height, ID);
         health = 10;
         active = false;
+        enemyHit = new Sound("Assets/TestAssets/zombieHit.ogg");
         //TEST
         refreshRate = refreshConstant;
         up = down = left = right = false;    
@@ -67,6 +71,7 @@ public class Enemy extends Entity{
     public void hit(int dmg){
         if(active){
             health -= dmg;
+            enemyHit.play(1,0.1f);
             if(health <= 0) targetPlayer.addScore(1);
         }
     }
@@ -133,4 +138,7 @@ public class Enemy extends Entity{
             g.fill(this);
         }
     }    
+    public boolean isActive(){
+        return active;
+    }
 }

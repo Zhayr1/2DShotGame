@@ -73,4 +73,12 @@ public class Bullet extends Entity{
     public int getDmg(){
         return dmg;
     }
+    //Setters
+    public void setReady(){
+        lifeTime = LIFE_TIME_CONSTANT;
+        active = false;
+        ready = true;
+        super.setX(-500);
+        super.setY(0);
+    }
 }

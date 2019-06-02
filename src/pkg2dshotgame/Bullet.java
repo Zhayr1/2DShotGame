@@ -60,7 +60,6 @@ public class Bullet extends Entity{
                 lifeTime = LIFE_TIME_CONSTANT;
                 active = false;
                 ready = true;
-                System.out.println("Bala recargada");
             }
         }
     }

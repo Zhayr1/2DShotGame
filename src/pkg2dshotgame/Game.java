@@ -47,6 +47,7 @@ public class Game extends BasicGameState{
     public ColitionsManager cmP,cmE;
     private GameContainer gameC;
     private Sound shot9mm,zombieHit;
+    private AmmoPack ap1,ap2,ap3;
     @Override
     public int getID() {
         return ID;
@@ -66,15 +67,15 @@ public class Game extends BasicGameState{
         globalTime = globalScore = globalWave = 0;
         auxTime = auxMb1 = auxMb2 = 0;
         auxDebug = false;
+        ap1 = new AmmoPack("Assets/AmmoPack.png",400,500,20,20,90,5);
         paredes = new ArrayList();
         paredes.add(new Rectangle(0,0,Main.SCREEN_X,10));
         paredes.add(new Rectangle(0,0,10,Main.SCREEN_Y));
         paredes.add(new Rectangle(0,Main.SCREEN_Y - 10,Main.SCREEN_X,10));
         paredes.add(new Rectangle(Main.SCREEN_X - 10,0,10,Main.SCREEN_Y));
         paredes.add(new Rectangle(200,300,400,20));
-        shotDelay = 300; // In MilliSeconds
+        shotDelay = 150; // In MilliSeconds
         gc.setMouseCursor("Assets/Cursor.png", 1, 1 );
-        gc.setVSync(true);
         cmP = new ColitionsManager();
         cmE = new ColitionsManager();
         shot9mm = new Sound("Assets/TestAssets/9mmFire.ogg");
@@ -91,6 +92,7 @@ public class Game extends BasicGameState{
         }
         this.renderBullets(g);
         p.render(g);
+        if(ap1.isActive()) ap1.render();
         enemyList.get(0).render(g);
         g.setColor(Color.red);
         if(Mouse.isInsideWindow()) g.fillOval(mx - 5, my - 5, 10, 10); // Mouse Point
@@ -167,6 +169,10 @@ public class Game extends BasicGameState{
                 if(enemyList.get(0).isActive()) auxB.setReady();
             } 
         }
+        if(p.intersects(ap1) && ap1.isActive()){
+            p.getGun().addBullets(ap1.getAmmo());
+            ap1.disable();
+        }
         //Player Colitions
         this.rigidBodyColitions(p);
         this.rigidBodyColitions(enemyList.get(0));
@@ -242,11 +248,13 @@ public class Game extends BasicGameState{
             auxDebug = !auxDebug;
             gameC.setShowFPS(auxDebug);
         }
-        
+        if(input.isKeyPressed(Input.KEY_R)){
+            p.getGun().reload();
+        }
         //
         //Mouse Inputs
         if(Mouse.isButtonDown(0) && auxMb1 == 0){
-            System.out.println("Click izq");
+            //CLICK IZQUIERDO
             for (int i = 0; i < auxGunSize; i++) {
                 if(auxGun.getBullets().get(i).isReady()){
                     p.shot((int)p.getX(),(int)p.getY(),mx, my);
@@ -256,7 +264,7 @@ public class Game extends BasicGameState{
             auxMb1 = shotDelay;
         }
         if(Mouse.isButtonDown(1) && auxMb2 == 0){
-            System.out.println("Click der");
+            //CLICK DERECHO
             auxMb2 = shotDelay;
         }
         if(auxMb1 > 0){

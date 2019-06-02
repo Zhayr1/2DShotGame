@@ -24,7 +24,7 @@ public class Enemy extends Entity{
     public final byte VEL;
     private boolean up,down,left,right;
     private int refreshRate; //In Milliseconds
-    private int refreshConstant = 50;
+    private int refreshConstant = 150;
     private Sound enemyHit;
     //\TEST
     
@@ -40,7 +40,7 @@ public class Enemy extends Entity{
         //TEST
         refreshRate = refreshConstant;
         up = down = left = right = false;    
-        VEL = 3;
+        VEL = 2;
         //\TEST
     }
     //\TEST
@@ -54,16 +54,18 @@ public class Enemy extends Entity{
     }    
     //\TEST
     public void follow(Player p){
+        if(health > 0){
         //Version en cordenadas polares
-        if(targetPlayer != p) targetPlayer = p;
-        xp = p.getX();
-        yp = p.getY();
-        xe = super.getX();
-        ye = super.getY();
-        //rp = 1;
-        //float atan = (float) Math.atan2(ye-yp, xe-xp);
-        //theta = (float) (Math.PI/2 - atan);
-        active = true;
+            if(targetPlayer != p) targetPlayer = p;
+            xp = p.getX();
+            yp = p.getY();
+            xe = super.getX();
+            ye = super.getY();
+            //rp = 1;
+            //float atan = (float) Math.atan2(ye-yp, xe-xp);
+            //theta = (float) (Math.PI/2 - atan);
+            active = true;
+        }
         //TEST
         
         //\TEST

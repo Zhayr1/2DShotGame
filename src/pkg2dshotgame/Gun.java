@@ -19,25 +19,28 @@ public class Gun {
     private final int chargerSize;
     private final float shotSpeedConstant;
     private final ArrayList<Bullet> arrB;
+    private final int reloadConstant = 1000;
     private int totalBullets;
     private int currentBullets;
     private boolean reloading;
     private float reloadDelay;
     private final Sound shotSound;
     private final Sound reloadSound;
+    private final Sound emptySound;
     
     public Gun(String ShotSoundRef,int chargerSize,float shotSpeed,int ID) throws SlickException{
         this.ID = ID;
         shotSound = new Sound(ShotSoundRef);
         reloadSound = new Sound("Assets/TestAssets/9mmLoad.ogg");
+        emptySound = new Sound("Assets/TestAssets/9mmEmpty.ogg");
         shotSpeedConstant = shotSpeed;
         this.chargerSize = chargerSize;
         reloading = false;
-        reloadDelay = 1000;
+        reloadDelay = reloadConstant;
         this.init();
         arrB = new ArrayList<>();
         for (int i = 0; i < chargerSize; i++) {
-            arrB.add(new Bullet(-500, 0, 5, 5, shotSpeed, ID));
+            arrB.add(new Bullet(-500, 0, 2, 2, shotSpeed, ID));
         }
     }
     
@@ -46,12 +49,16 @@ public class Gun {
         currentBullets = chargerSize;
     }
     public boolean reload(){
-        while(currentBullets < chargerSize){
-            if(totalBullets > 0){
-                currentBullets++;
-                totalBullets--;
-            }else{
-                return false;
+        if(totalBullets > 0 && currentBullets != chargerSize){
+            reloading = true;
+            reloadSound.play(1,0.9f);        
+            while(currentBullets < chargerSize){
+                if(totalBullets > 0){
+                    currentBullets++;
+                    totalBullets--;
+                }else{
+                    return false;
+                }
             }
         }
         return true;
@@ -61,7 +68,7 @@ public class Gun {
             reloadDelay -= delta;
             if(reloadDelay <= 0){
                 reloading = false;
-                reloadDelay = shotSpeedConstant * 0.5f;
+                reloadDelay = reloadConstant;
             }
         }
     }
@@ -71,9 +78,9 @@ public class Gun {
             shotSound.play(1,0.2f);
             currentBullets--;
         }else if(currentBullets == 0 && totalBullets > 0 && !reloading){
-            reloadSound.play(1,0.3f);
-            reloading = true;
             this.reload();
+        }else if(currentBullets == 0 && !reloading && totalBullets == 0){
+            emptySound.play(1,0.9f);
         }else{
             return false;
         }

@@ -39,7 +39,7 @@ public class Player extends Entity{
         score = 0;
         currentGun = 0;
         gunList = new ArrayList();
-        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",15,1f,3));
+        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",15,1,3));
     }
     
     public void updateMovement(){

@@ -25,6 +25,16 @@ import org.newdawn.slick.state.StateBasedGame;
 public class Game extends BasicGameState{
 
     private static int ID = 1;
+
+    //Mapa
+    private final int WORLD_SIZE_X = 2000;
+    private final int WORLD_SIZE_Y = 2000;
+    //Camara
+    private int offsetMaxX,offsetMaxY,offsetMinX,offsetMinY;
+    private final int VIEWPORT_SIZE_X = Main.SCREEN_X;
+    private final int VIEWPORT_SIZE_Y = Main.SCREEN_Y;
+    private float camX,camY;
+    //    
     private int globalTime;
     private int globalScore;
     private int globalWave;
@@ -60,6 +70,7 @@ public class Game extends BasicGameState{
         auxGunSize = auxGun.getChargerSize();
         enemyList = new ArrayList<>();
         gameC = gc;
+        this.initCam();
         for (int i = 0; i < 1; i++) {
             enemyList.add(new Enemy(100,100,20,20,3));
         }
@@ -69,10 +80,10 @@ public class Game extends BasicGameState{
         auxDebug = false;
         ap1 = new AmmoPack("Assets/AmmoPack.png",400,500,20,20,90,5);
         paredes = new ArrayList();
-        paredes.add(new Rectangle(0,0,Main.SCREEN_X,10));
-        paredes.add(new Rectangle(0,0,10,Main.SCREEN_Y));
-        paredes.add(new Rectangle(0,Main.SCREEN_Y - 10,Main.SCREEN_X,10));
-        paredes.add(new Rectangle(Main.SCREEN_X - 10,0,10,Main.SCREEN_Y));
+        paredes.add(new Rectangle(0,0,WORLD_SIZE_X,10));
+        paredes.add(new Rectangle(0,0,10,WORLD_SIZE_Y));
+        paredes.add(new Rectangle(0,WORLD_SIZE_X - 10,WORLD_SIZE_X,10));
+        paredes.add(new Rectangle(WORLD_SIZE_Y - 10,0,10,WORLD_SIZE_Y));
         paredes.add(new Rectangle(200,300,400,20));
         shotDelay = 150; // In MilliSeconds
         gc.setMouseCursor("Assets/Cursor.png", 1, 1 );
@@ -81,21 +92,42 @@ public class Game extends BasicGameState{
         shot9mm = new Sound("Assets/TestAssets/9mmFire.ogg");
         zombieHit = new Sound("Assets/TestAssets/zombieHit.ogg");
     }
-
+    private void initCam(){
+        offsetMaxX = WORLD_SIZE_X - VIEWPORT_SIZE_X;
+        offsetMaxY = WORLD_SIZE_Y - VIEWPORT_SIZE_Y;
+        offsetMinX = 0;
+        offsetMinY = 0;       
+    }    
+    private void updateCameraOffSets(){
+        camX = p.getX() - VIEWPORT_SIZE_X / 2;
+        camY = p.getY() - VIEWPORT_SIZE_Y / 2;    
+        
+        if (camX > offsetMaxX){
+            camX = offsetMaxX;
+        }else if (camX < offsetMinX){
+            camX = offsetMinX;
+        }
+        if (camY > offsetMaxY){
+            camY = offsetMaxY;
+        }else if (camY < offsetMinY){
+            camY = offsetMinY;
+        }
+    }
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
+        g.translate(-camX, -camY);
         this.renderMap(g);
-        if(auxDebug){
-            this.renderDebug(gc,g);
-        }else{
-            this.renderHUD(g);
-        }
         this.renderBullets(g);
         p.render(g);
         if(ap1.isActive()) ap1.render();
         enemyList.get(0).render(g);
         g.setColor(Color.red);
-        if(Mouse.isInsideWindow()) g.fillOval(mx - 5, my - 5, 10, 10); // Mouse Point
+        if(auxDebug){
+            this.renderDebug(gc,g);
+        }else{
+            this.renderHUD(g);
+        }        
+        if(Mouse.isInsideWindow()) g.fillOval(camX+mx - 5, camY+my - 5, 10, 10); // Mouse Point
     }
 
     @Override
@@ -103,14 +135,15 @@ public class Game extends BasicGameState{
         this.updateEnviromentVars(i);
         this.updateMovements(i);
         this.updateEntityColitions();
+        this.updateCameraOffSets();
     }
     private void renderDebug(GameContainer gc,Graphics g){
         g.setColor(Color.yellow);
         //Strings
-        g.drawString("Time: "+globalTime, 10, 50);
-        g.drawString("Mx: "+Mouse.getX(),10,80);
-        g.drawString("My: "+(Math.abs( Mouse.getY() - Main.SCREEN_Y ) ),10,100);
-        g.drawString("Px: "+p.getX()+"\nPy: "+p.getY(), 10, 120);
+        g.drawString("Time: "+globalTime, camX +10, camY +50);
+        g.drawString("Mx: "+Mouse.getX(),camX +10,camY +80);
+        g.drawString("My: "+(Math.abs( Mouse.getY() - Main.SCREEN_Y ) ),camX +10,camY +100);
+        g.drawString("Px: "+p.getX()+"\nPy: "+p.getY(), camX +10, camY +120);
         //Figuras Geometricas y Lineas
     }
     private void renderHUD(Graphics g){
@@ -118,7 +151,7 @@ public class Game extends BasicGameState{
         String auxS = "Hp: "+p.getHealth()+"\nBalas: "+auxGun.getCurrentBullets()+"/"+auxGun.getTotalBullets()+
                       "\nScore: "+p.getScore()+"\n";
         auxS += "Wave: "+globalWave;
-        g.drawString(auxS, 10, 10);
+        g.drawString(auxS, camX + 10, camY + 10);
     }
     private void renderMap(Graphics g){
         g.setBackground(Color.black);
@@ -257,7 +290,7 @@ public class Game extends BasicGameState{
             //CLICK IZQUIERDO
             for (int i = 0; i < auxGunSize; i++) {
                 if(auxGun.getBullets().get(i).isReady()){
-                    p.shot((int)p.getX(),(int)p.getY(),mx, my);
+                    p.shot((int)p.getX(),(int)p.getY(),(int)(mx+camX),(int)(my+camY));
                     break;
                 }
             }

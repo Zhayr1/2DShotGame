@@ -7,6 +7,8 @@ package pkg2dshotgame;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Circle;
 
 /**
@@ -21,11 +23,13 @@ public class Bullet extends Entity{
     private int dmg;
     private float rp,xp,yp,theta,lifeTime;
     private boolean active,ready;
+    private Image img;
     
-    public Bullet(float x, float y, int width, int height,float bulletSpeed, int ID) {
+    public Bullet(float x, float y, int width, int height,float bulletSpeed, int ID) throws SlickException {
         super(x, y, width, height, ID);
         rp = xp = yp = theta = 0;
         dmg = 1;
+        img = new Image("Assets/Bullet.png");
         active = false;
         ready = true;
         lifeTime = LIFE_TIME_CONSTANT;

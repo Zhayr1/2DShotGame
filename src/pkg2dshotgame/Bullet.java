@@ -18,7 +18,7 @@ import org.newdawn.slick.geom.Circle;
  */
 public class Bullet extends Entity{
     
-    public final int LIFE_TIME_CONSTANT = 3000; // In MilliSeconds
+    public final int LIFE_TIME_CONSTANT = 1500; // In MilliSeconds
     private final float BULLET_SPEED_CONSTANT;
     private int dmg;
     private float rp,xp,yp,theta,lifeTime;
@@ -38,7 +38,8 @@ public class Bullet extends Entity{
     public void render(Graphics g){
         if(active){
             g.setColor(Color.white);
-            g.fill(this);
+            //g.fill(this);
+            img.draw(super.getX(), super.getY(),width,height);
         }
     }
     public void shot(int xp,int yp,int x2,int y2){

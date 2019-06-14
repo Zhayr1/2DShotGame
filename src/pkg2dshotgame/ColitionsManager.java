@@ -5,10 +5,6 @@
  */
 package pkg2dshotgame;
 
-import java.util.ArrayList;
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
@@ -31,7 +27,18 @@ public class ColitionsManager {
     public boolean checkBasicColition(Shape a,Shape b){
         return a.intersects(b);
     }
-    
+    public boolean checkFutureCol(float xa, float ya,float wa,float ha,float xb, float yb,float wb,float hb){
+        Rectangle rectA,rectB;
+        rectA = new Rectangle(xa,ya,wa,ha);
+        rectB = new Rectangle(xb,yb,wb,hb);
+        return rectA.intersects(rectB);
+    }
+    public boolean checkFutureCol(float xp,float yp,float wp,float hp,Rectangle rb){
+        Rectangle rectA,rectB;
+        rectA = new Rectangle(xp,yp,wp,hp);
+        rectB = rb;
+        return rectB.intersects(rectA);
+    }
     public int checkCol(Shape a,Shape b){
         float ax1,ax2,ay1,ay2,bx1,bx2,by1,by2;
         //A - player

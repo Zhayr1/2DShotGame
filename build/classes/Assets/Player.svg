@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="Player.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="496.43187"
+     inkscape:cy="429.59176"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1360"
+     inkscape:window-height="706"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     showguides="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g906"
+       transform="matrix(2.2125528,0,0,2.2125528,-120.25067,-278.75938)"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347">
+      <g
+         transform="matrix(1,0,0,0.71599972,0,62.858947)"
+         id="g881">
+        <rect
+           style="opacity:1;fill:#004455;fill-opacity:0.99494952;stroke:none;stroke-width:0.22440624;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect857"
+           width="2.6458333"
+           height="7"
+           x="103.56547"
+           y="212.47084" />
+        <rect
+           style="opacity:1;fill:#004455;fill-opacity:0.99494952;stroke:none;stroke-width:0.22440627;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect857-9"
+           width="2.6458333"
+           height="7"
+           x="108.95637"
+           y="212.47069" />
+        <rect
+           style="opacity:1;fill:#004455;fill-opacity:0.99494952;stroke:none;stroke-width:0.26825291;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect876"
+           width="8.0367355"
+           height="5.0081844"
+           x="103.56547"
+           y="207.99182" />
+      </g>
+      <rect
+         y="214.98801"
+         x="104.94508"
+         height="1.6063988"
+         width="1.7953868"
+         id="rect883"
+         style="opacity:1;fill:#004455;fill-opacity:0.99494952;stroke:none;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         y="214.9879"
+         x="108.21931"
+         height="1.6063988"
+         width="1.7953869"
+         id="rect883-0"
+         style="opacity:1;fill:#004455;fill-opacity:0.99494952;stroke:none;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <rect
+       style="opacity:1;fill:#784421;fill-opacity:0.99494952;stroke:none;stroke-width:0.50002092;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect908"
+       width="5.8540459"
+       height="3.0315592"
+       x="108.89341"
+       y="207.91153"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#784421;fill-opacity:0.99494952;stroke:none;stroke-width:0.50002092;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect908-6"
+       width="5.8540459"
+       height="3.0315597"
+       x="120.82106"
+       y="207.91153"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#d38d5f;fill-opacity:0.99494952;stroke:none;stroke-width:0.6018306;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect927"
+       width="5.2267909"
+       height="19.912975"
+       x="103.66657"
+       y="172.56154"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#d38d5f;fill-opacity:0.99494952;stroke:none;stroke-width:0.60183054;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect927-7"
+       width="5.2267914"
+       height="19.912975"
+       x="126.64252"
+       y="172.56233"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#d38d5f;fill-opacity:0.99607843;stroke:none;stroke-width:0.64324325;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect961"
+       width="15.375049"
+       height="13.896675"
+       x="110.14992"
+       y="156.00989"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <g
+       id="g4672"
+       transform="matrix(2.2125528,0,0,2.2125528,-120.25067,-278.75938)"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347">
+      <rect
+         y="203.98006"
+         x="103.56546"
+         height="8.3301401"
+         width="8.0792494"
+         id="rect925"
+         style="opacity:1;fill:#0055d4;fill-opacity:0.99494952;stroke:none;stroke-width:0.2492412;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         y="202.45869"
+         x="101.20312"
+         height="1.5232896"
+         width="3.4962549"
+         id="rect944"
+         style="opacity:1;fill:#0055d4;fill-opacity:0.99607843;stroke:none;stroke-width:0.19360769;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         y="202.45906"
+         x="111.58749"
+         height="1.5232897"
+         width="2.3623266"
+         id="rect944-0"
+         style="opacity:1;fill:#0055d4;fill-opacity:0.99607843;stroke:none;stroke-width:0.15914427;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         y="202.45869"
+         x="103.56544"
+         height="1.7271835"
+         width="8.0310574"
+         id="rect4666"
+         style="opacity:1;fill:#0055d4;fill-opacity:0.99607843;stroke:none;stroke-width:0.3825478;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.99494952;stroke:none;stroke-width:0.57471341;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4674"
+       width="15.3648"
+       height="3.0412722"
+       x="110.14992"
+       y="156.00983"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.99494952;stroke:none;stroke-width:0.58632648;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4678"
+       width="1.8665191"
+       height="1.2675306"
+       x="110.14992"
+       y="159.05112"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.99494952;stroke:none;stroke-width:0.58632648;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4678-0"
+       width="1.8665191"
+       height="1.2675306"
+       x="123.64819"
+       y="159.05112"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.99494952;stroke:none;stroke-width:0.63168514;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4695"
+       width="1.8875482"
+       height="2.0881975"
+       x="113.82702"
+       y="161.66298"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.99494952;stroke:none;stroke-width:0.63168514;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4695-5"
+       width="1.8875482"
+       height="2.0881975"
+       x="120.31113"
+       y="161.66298"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+    <ellipse
+       style="opacity:1;fill:#c84f4f;fill-opacity:0.99494952;stroke:none;stroke-width:0.41042855;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4725"
+       cx="118.07436"
+       cy="166.65619"
+       rx="1.0793396"
+       ry="0.5488168"
+       inkscape:export-filename="C:\Users\Jesus\Documents\NetBeansProjects\2DShotGame\src\Assets\Player.png"
+       inkscape:export-xdpi="43.673347"
+       inkscape:export-ydpi="43.673347" />
+  </g>
+</svg>

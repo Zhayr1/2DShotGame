@@ -7,6 +7,7 @@ package pkg2dshotgame;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
@@ -26,6 +27,7 @@ public class Enemy extends Entity{
     private int refreshRate; //In Milliseconds
     private int refreshConstant = 150;
     private Sound enemyHit;
+    private Image img,deathimg,rotateImg,rotateAuxImg,rotateAuxImg2;
     //\TEST
     
     private int health;
@@ -40,7 +42,14 @@ public class Enemy extends Entity{
         //TEST
         refreshRate = refreshConstant;
         up = down = left = right = false;    
-        VEL = 2;
+        VEL = 1;
+        img = new Image("Assets/enemy.png");
+        rotateImg  = new Image("Assets/enemy.png");
+        rotateAuxImg = new Image("Assets/enemy.png");
+        rotateAuxImg2 = new Image("Assets/enemy.png");
+        deathimg = new Image("Assets/deathEnemy.png");
+        rotateAuxImg.rotate(90);
+        rotateAuxImg2.rotate(180);
         //\TEST
     }
     //\TEST
@@ -65,6 +74,18 @@ public class Enemy extends Entity{
             //float atan = (float) Math.atan2(ye-yp, xe-xp);
             //theta = (float) (Math.PI/2 - atan);
             active = true;
+            if(up){
+                rotateImg = img.getFlippedCopy(false, true);
+            }
+            if(down){
+                rotateImg = img;
+            }
+            if(left){
+                rotateImg = rotateAuxImg;
+            }
+            if(right){
+                rotateImg = rotateAuxImg2;
+            }
         }
         //TEST
         
@@ -133,11 +154,11 @@ public class Enemy extends Entity{
     //\TEST
     public void render(Graphics g){
         if(active){
-            g.setColor(Color.red);
-            g.fill(this);
+            //g.fill(this);
+            rotateImg.draw(super.getX(),super.getY());
         }else{
-            g.setColor(Color.gray);
-            g.fill(this);
+            //g.fill(this);
+            deathimg.draw(super.getX(),super.getY());
         }
     }    
     public boolean isActive(){

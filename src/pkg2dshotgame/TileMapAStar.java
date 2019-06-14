@@ -6,11 +6,9 @@
 package pkg2dshotgame;
 
 import java.util.ArrayList;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
-import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 /**
@@ -21,12 +19,15 @@ public class TileMapAStar{
     
     private final ArrayList<Rectangle> boundaries;
     private AStarPathFinder starPath;
-    private Path apath;
     private TiledGameMap map;
 
     public TileMapAStar(TileBasedMap map, int maxSearchDistance, boolean allowDiagMovement,ArrayList<Rectangle> bound) {
         boundaries = bound;
+        starPath = new AStarPathFinder(map, maxSearchDistance, allowDiagMovement);
+        this.map = (TiledGameMap) map;
     }
     
-    
+    public AStarPathFinder getPathFinder(){
+        return starPath;
+    }
 }

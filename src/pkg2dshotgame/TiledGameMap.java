@@ -25,6 +25,7 @@ public class TiledGameMap implements TileBasedMap{
     private final int mapHeight;
     private final int mapTileWidth;
     private final int mapTileHeight;
+    
     private ArrayList<Point> auxList;
     
     public TiledGameMap(TiledMap map,ArrayList<Rectangle> boundaries){
@@ -44,14 +45,14 @@ public class TiledGameMap implements TileBasedMap{
             int startX; 
             int startY;
             if(bound.getX()/auxTileWidth == 1){
-                startX = (int) auxTileWidth;
+                startX = (int) mapTileWidth;
             }else{
-                startX = (int) bound.getX()/auxTileWidth;
+                startX = (int) bound.getX()/mapTileWidth;
             }
             if(bound.getY()/auxTileHeight == 1){
-                startY = (int) auxTileHeight;
+                startY = (int) mapTileHeight;
             }else{
-                startY = (int) bound.getX()/auxTileHeight;
+                startY = (int) bound.getY()/mapTileHeight;
             }
             for (int i = 0; i < auxTileHeight; i++) {
                 for (int j = 0; j < auxTileWidth; j++) {
@@ -64,6 +65,8 @@ public class TiledGameMap implements TileBasedMap{
             int auxY = (int)p.getY();
             tileBasedMap[auxX][auxY] = 1;
         }
+    }
+    public void printMatrixMap(){
         for(int i = 0; i < mapHeight; i++){
             for (int j = 0; j < mapWidth; j++) {
                 System.out.print(tileBasedMap[j][i]);
@@ -71,15 +74,14 @@ public class TiledGameMap implements TileBasedMap{
             System.out.print("\n");
         }
     }
-
     @Override
     public int getWidthInTiles() {
-        return mapWidth/mapTileWidth;
+        return mapWidth;
     }
 
     @Override
     public int getHeightInTiles() {
-        return mapHeight/mapTileHeight;
+        return mapHeight;
     }
 
     @Override
@@ -88,7 +90,8 @@ public class TiledGameMap implements TileBasedMap{
 
     @Override
     public boolean blocked(PathFindingContext pfc, int tx, int ty) {
-        return boundaries.stream().filter((boundarie) -> (boundarie.getX() >= tx && boundarie.getX()+boundarie.getWidth() <= tx+mapTileWidth)).anyMatch((boundarie) -> (boundarie.getY() >= ty && boundarie.getY()+boundarie.getHeight() <= tx+mapTileHeight));
+        //return boundaries.stream().filter((boundarie) -> (boundarie.getX() >= tx && boundarie.getX()+boundarie.getWidth() <= tx+mapTileWidth)).anyMatch((boundarie) -> (boundarie.getY() >= ty && boundarie.getY()+boundarie.getHeight() <= tx+mapTileHeight));
+        return tileBasedMap[(int)(tx)][(int)(ty)] == 1;
     }
 
     @Override

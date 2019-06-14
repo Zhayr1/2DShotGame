@@ -13,7 +13,7 @@ import org.newdawn.slick.util.pathfinding.Mover;
  */
 public class TestMover extends Entity implements Mover{
     
-    public TestMover(float x, float y, int ID) {
-        super(x, y, ID);
+    public TestMover(float x, float y, int width, int height, int ID) {
+        super(x, y, width, height, ID);
     }
 }

@@ -33,6 +33,8 @@ public class Game extends BasicGameState{
     private final int WORLD_SIZE_X = 3200;
     private final int WORLD_SIZE_Y = 3200;
     TiledGameMap map;
+    TileMapAStar tmap;
+    Path path;
     //Camara
     private int offsetMaxX,offsetMaxY,offsetMinX,offsetMinY;
     private final int VIEWPORT_SIZE_X = Main.SCREEN_X;
@@ -75,7 +77,7 @@ public class Game extends BasicGameState{
         enemyList = new ArrayList<>();
         gameC = gc;
         this.initCam();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             enemyList.add(new Enemy(100 * (i+1),100 * (i+1),32,32,3));
         }
         input = gc.getInput();
@@ -84,17 +86,18 @@ public class Game extends BasicGameState{
         auxDebug = false;
         ap1 = new AmmoPack("Assets/AmmoPack.png",400,500,20,20,900,5);
         paredes = new ArrayList();
-        //paredes.add(new Rectangle(0,0,WORLD_SIZE_X,32));
-        //paredes.add(new Rectangle(0,0,32,WORLD_SIZE_Y));
+        paredes.add(new Rectangle(0,0,WORLD_SIZE_X,32));
+        paredes.add(new Rectangle(0,0,32,WORLD_SIZE_Y));
         paredes.add(new Rectangle(0,WORLD_SIZE_X - 32,WORLD_SIZE_X,32));
-        //paredes.add(new Rectangle(WORLD_SIZE_Y - 32,0,32,WORLD_SIZE_Y));
-        //paredes.add(new Rectangle(128,256,320,32));
+        paredes.add(new Rectangle(WORLD_SIZE_Y - 32,0,32,WORLD_SIZE_Y));
+        paredes.add(new Rectangle(128,256,320,32));
         shotDelay = 70; // In MilliSeconds
         gc.setMouseCursor("Assets/Cursor.png", 1, 1 );
         cmP = new ColitionsManager();
         cmE = new ColitionsManager();
         map = new TiledGameMap(new TiledMap("Assets/TestMap.tmx"),paredes);
-        
+        tmap = new TileMapAStar(map,100,false,paredes);
+        path = tmap.getPathFinder().findPath(p, 1, 1, 8, 9);
     }
     private void initCam(){
         offsetMaxX = WORLD_SIZE_X - VIEWPORT_SIZE_X;
@@ -121,6 +124,7 @@ public class Game extends BasicGameState{
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
         g.translate(-camX, -camY);
         this.renderMap(g);
+        g.setColor(Color.yellow);
         this.renderBullets(g);
         if(ap1.isActive()) ap1.render();
         this.renderEnemies(g);

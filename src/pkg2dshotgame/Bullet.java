@@ -5,11 +5,9 @@
  */
 package pkg2dshotgame;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Circle;
 
 /**
  *
@@ -23,12 +21,12 @@ public class Bullet extends Entity{
     private int dmg;
     private float rp,xp,yp,theta,lifeTime;
     private boolean active,ready;
-    private Image img;
+    private final Image img;
     
-    public Bullet(float x, float y, int width, int height,float bulletSpeed, int ID) throws SlickException {
+    public Bullet(float x, float y, int width, int height,float bulletSpeed,int dmg, int ID) throws SlickException {
         super(x, y, width, height, ID);
         rp = xp = yp = theta = 0;
-        dmg = 1;
+        this.dmg = dmg;
         img = new Image("Assets/Bullet.png");
         active = false;
         ready = true;
@@ -37,9 +35,7 @@ public class Bullet extends Entity{
     }
     public void render(Graphics g){
         if(active){
-            g.setColor(Color.white);
-            //g.fill(this);
-            img.draw(super.getX(), super.getY(),width,height);
+            img.draw(super.getX(), super.getY(),width *2,height*2);
         }
     }
     public void shot(int xp,int yp,int x2,int y2){

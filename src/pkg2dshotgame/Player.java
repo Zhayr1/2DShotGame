@@ -6,12 +6,10 @@
 package pkg2dshotgame;
 
 import java.util.ArrayList;
-import java.util.List;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.tiled.TileSet;
 import org.newdawn.slick.util.pathfinding.Mover;
 
 /**
@@ -30,8 +28,11 @@ public class Player extends Entity implements Mover{
     private int currentGun;
     //
     private int health;
+    private int invTime;
+    private boolean isInv;
     private int score;
-    private Image img,aimImg;
+    private final Image img;
+    private final Image aimImg;
     //Variables de movimiento
     private boolean up,down,left,right;
     
@@ -46,22 +47,41 @@ public class Player extends Entity implements Mover{
         aimImg.setCenterOfRotation(auxw/2, auxh/2);
         VEL = 3;
         health = 10;
+        invTime = 500;
+        isInv = false;
         score = 0;
         currentGun = 0;
         gunList = new ArrayList();
-        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",150,1,3));
+        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",15,45,250,1,2,500,false,Gun.NINEMM));
+        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",150,300,100,1,1,750,true,Gun.UZI));
+        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",7,21,500,2,5,1000,false,Gun.AWP));
     }
-    public void updateMovement(int mx,int my){
+    public void updateMovement(int mx,int my,int delta){
         if(up)    super.setY(y - VEL);
         if(down)  super.setY(y + VEL);
         if(left)  super.setX(x - VEL);
         if(right) super.setX(x + VEL);
+        this.updateTimers(delta);
     }
     public void render(Graphics g){
         g.setColor(Color.white);
         //g.fill(this);
         img.draw(super.getX(),super.getY());
         aimImg.draw(super.getX(),super.getY());
+    }
+    public void updateTimers(int delta){
+        if(isInv && invTime > 0){
+            invTime -= delta;
+        }else if(invTime <= 0){
+            isInv = false;
+            invTime = 500;
+        }
+    }
+    public void hit(int dmg){
+        if(!isInv){
+            health -= dmg;
+            isInv = true;
+        }
     }
     //Setters
     public void setDir(boolean set,int key){
@@ -93,6 +113,22 @@ public class Player extends Entity implements Mover{
     //Getters
     public Gun getGun(){
         return gunList.get(currentGun);
+    }
+    public void nextGun(){
+        if(currentGun + 1 > gunList.size() - 1){
+            currentGun = 0;
+        }else{
+            currentGun++;
+        }
+        System.out.println("CurrentGun: "+currentGun);
+    }
+    public void previousGun(){
+        if(currentGun - 1 < 0){
+            currentGun = gunList.size() - 1;
+        }else{
+            currentGun--;
+        }
+        System.out.println("CurrentGun: "+currentGun);
     }
     public int getHealth(){
         return health;

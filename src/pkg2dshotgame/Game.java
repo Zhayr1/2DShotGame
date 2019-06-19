@@ -13,13 +13,9 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
-import org.newdawn.slick.util.pathfinding.AStarPathFinder;
-import org.newdawn.slick.util.pathfinding.Path;
-import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 /**
  *
@@ -27,14 +23,13 @@ import org.newdawn.slick.util.pathfinding.TileBasedMap;
  */
 public class Game extends BasicGameState{
 
-    private static int ID = 1;
+    private static final int ID = 1;
 
     //Mapa
     private final int WORLD_SIZE_X = 3200;
     private final int WORLD_SIZE_Y = 3200;
     TiledGameMap map;
     TileMapAStar tmap;
-    Path path;
     //Camara
     private int offsetMaxX,offsetMaxY,offsetMinX,offsetMinY;
     private final int VIEWPORT_SIZE_X = Main.SCREEN_X;
@@ -51,16 +46,18 @@ public class Game extends BasicGameState{
     private boolean auxDebug;
     //
     private int auxMb1,auxMb2;
+    private boolean auxMbLeft,auxMbRight;
     private int shotDelay;
     //Player
     private Player p;
-    private int auxGunSize;
-    private Gun auxGun;
     //Enemys
     private ArrayList<Enemy> enemyList;
     //AStar
     //Bloques de colision
-    private ArrayList<Rectangle> paredes;
+    private ArrayList<Rectangle> walls;
+    private ArrayList<Rectangle> roof;
+    private int auxRoof;
+    private boolean inRoof;
     public ColitionsManager cmP,cmE;
     private GameContainer gameC;
     private AmmoPack ap1,ap2,ap3;
@@ -72,8 +69,6 @@ public class Game extends BasicGameState{
     @Override
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         p = new Player(500,400,32,32,1);
-        auxGun = p.getGun();
-        auxGunSize = auxGun.getChargerSize();
         enemyList = new ArrayList<>();
         gameC = gc;
         this.initCam();
@@ -84,20 +79,33 @@ public class Game extends BasicGameState{
         globalTime = globalScore = globalWave = 0;
         auxTime = auxMb1 = auxMb2 = 0;
         auxDebug = false;
+        auxMbLeft = true;
+        auxMbRight = true;
         ap1 = new AmmoPack("Assets/AmmoPack.png",400,500,20,20,900,5);
-        paredes = new ArrayList();
-        paredes.add(new Rectangle(0,0,WORLD_SIZE_X,32));
-        paredes.add(new Rectangle(0,0,32,WORLD_SIZE_Y));
-        paredes.add(new Rectangle(0,WORLD_SIZE_X - 32,WORLD_SIZE_X,32));
-        paredes.add(new Rectangle(WORLD_SIZE_Y - 32,0,32,WORLD_SIZE_Y));
-        paredes.add(new Rectangle(128,256,320,32));
-        shotDelay = 70; // In MilliSeconds
+        walls = new ArrayList();
+        walls.add(new Rectangle(0,0,WORLD_SIZE_X,32));
+        walls.add(new Rectangle(0,0,32,WORLD_SIZE_Y));
+        walls.add(new Rectangle(0,WORLD_SIZE_X - 32,WORLD_SIZE_X,32));
+        walls.add(new Rectangle(WORLD_SIZE_Y - 32,0,32,WORLD_SIZE_Y));
+        walls.add(new Rectangle(16*32,32,32,8*32));
+        walls.add(new Rectangle(23*32,32,32,8*32));
+        walls.add(new Rectangle(16*32,8*32,32 * 3,32));
+        walls.add(new Rectangle(21*32,8*32,32 * 3,32));
+        walls.add(new Rectangle(0,13*32,8*32,32));
+        walls.add(new Rectangle(0,21*32,8*32,32));
+        walls.add(new Rectangle(7*32,13*32,32,3*32));
+        walls.add(new Rectangle(7*32,19*32,32,3*32));
+        roof = new ArrayList();
+        roof.add(new Rectangle(17*32,32,6*32,7*32));
+        roof.add(new Rectangle(32,14*32,6*32,7*32));
+        auxRoof = 0;
+        inRoof = false;
+        shotDelay = 30; // In MilliSeconds
         gc.setMouseCursor("Assets/Cursor.png", 1, 1 );
         cmP = new ColitionsManager();
         cmE = new ColitionsManager();
-        map = new TiledGameMap(new TiledMap("Assets/TestMap.tmx"),paredes);
-        tmap = new TileMapAStar(map,100,false,paredes);
-        path = tmap.getPathFinder().findPath(p, 1, 1, 8, 9);
+        map = new TiledGameMap(new TiledMap("Assets/TestMap.tmx"),walls);
+        tmap = new TileMapAStar(map,100,false,walls);
     }
     private void initCam(){
         offsetMaxX = WORLD_SIZE_X - VIEWPORT_SIZE_X;
@@ -128,7 +136,6 @@ public class Game extends BasicGameState{
         this.renderBullets(g);
         if(ap1.isActive()) ap1.render();
         this.renderEnemies(g);
-        g.setColor(Color.white);
         p.render(g);
         if(auxDebug){
             this.renderDebug(gc,g);
@@ -165,39 +172,40 @@ public class Game extends BasicGameState{
     }
     private void renderHUD(Graphics g){
         g.setColor(Color.white);
-        String auxS = "Hp: "+p.getHealth()+"\nBalas: "+auxGun.getCurrentBullets()+"/"+auxGun.getTotalBullets()+
+        String auxS = "Hp: "+p.getHealth()+"\nBalas: "+p.getGun().getCurrentBullets()+"/"+p.getGun().getTotalBullets()+
                       "\nScore: "+p.getScore()+"\n";
         auxS += "Wave: "+globalWave;
         g.drawString(auxS, camX + 10, camY + 10);
     }
     private void renderMap(Graphics g){
-        g.setBackground(Color.black);
-        map.getTiledMap().render(0, 0);
-        g.setColor(Color.darkGray);
-        for (int i = 0; i < paredes.size(); i++) {
-            g.fill((Shape) paredes.get(i));
+        map.getTiledMap().render(0, 0, 0);
+        if(inRoof){
+            g.setColor(Color.black);
+            g.fill(new Rectangle(camX,camY,this.VIEWPORT_SIZE_X,this.VIEWPORT_SIZE_Y));
+        }
+        map.getTiledMap().render(0, 0, 1);
+        if(!inRoof){
+            map.getTiledMap().render(0, 0, 2);    
         }
     }
     private void renderBullets(Graphics g){
-        int auxBalas = auxGunSize;
-        for (int i = 0; i < auxBalas; i++) {
-            if(auxGun.getBullets().get(i).isActive()){
-                auxGun.getBullets().get(i).render(g);
+        for (int i = 0; i < p.getGun().getBullets().size(); i++) {
+            if(p.getGun().getBullets().get(i).isActive()){
+                p.getGun().getBullets().get(i).render(g);
             }
         }
     }
     private void updateMovements(int delta){
         //PlayerMovement
-        p.updateMovement((int)(mx+camX),(int)(my+camY));
+        p.updateMovement((int)(mx+camX),(int)(my+camY),delta);
         //Enemies Movement
         for (int i = 0; i < enemyList.size(); i++) {
-            enemyList.get(i).updatePosition(delta);    
+            enemyList.get(i).updatePosition(delta,tmap,p);    
         }
         //BulletsMovement
-        int auxBalas = auxGunSize;
-        for (int i = 0; i < auxBalas; i++) {
-            if(auxGun.getBullets().get(i).isActive()){
-                auxGun.getBullets().get(i).updatePosition(delta);
+        for (int i = 0; i < p.getGun().getBullets().size(); i++) {
+            if(p.getGun().getBullets().get(i).isActive()){
+                p.getGun().getBullets().get(i).updatePosition(delta);
             }
         }
         //Input Manager
@@ -212,11 +220,23 @@ public class Game extends BasicGameState{
         }
         mx = Mouse.getX();
         my = Math.abs( Mouse.getY() - Main.SCREEN_Y );  
-        auxGun.reloadDelay(delta);
+        p.getGun().reloadDelay(delta);
+        for(Rectangle rect: roof){
+            if(!rect.intersects(p)){
+                auxRoof++;
+            }
+        }
+        if(auxRoof == roof.size()){
+            inRoof = false;
+            auxRoof = 0;
+        }else{
+            inRoof = true;
+            auxRoof = 0;
+        }
     }
     private void updateEntityColitions(){
-        for (int i = 0; i < auxGunSize; i++) {
-            Bullet auxB = auxGun.getBullets().get(i);
+        for (int i = 0; i < p.getGun().getBullets().size(); i++) {
+            Bullet auxB = p.getGun().getBullets().get(i);
             if(auxB.isActive()){
                 for (int j = 0; j < enemyList.size(); j++) {
                     if(enemyList.get(j).isActive()){
@@ -225,6 +245,9 @@ public class Game extends BasicGameState{
                             auxB.setReady();
                         }
                     }
+                }
+                for(Rectangle rect: walls){
+                    if(auxB.intersects(rect)) auxB.setReady();
                 }
             } 
         }
@@ -235,94 +258,79 @@ public class Game extends BasicGameState{
         //Player Colitions
         //this.rigidBodyColitions(p);
         //EnemyColitions
-        for (int i = 0; i < enemyList.size(); i++) {
-            if(enemyList.get(i).isActive())this.rigidBodyColitions(enemyList.get(i));
-        }
     }
-    private void rigidBodyColitions(Enemy e){
-        for (int i = 0; i < paredes.size(); i++) {
-            if(e.intersects(paredes.get(i))){
-                switch(cmE.checkCol(e, paredes.get(i))){
-                    case ColitionsManager.UP:
-                        e.setDir(false, p.DOWN);
-                        break;
-                    case ColitionsManager.DOWN:
-                        e.setDir(false, p.UP);
-                        break;
-                    case ColitionsManager.LEFT:
-                        e.setDir(false, p.RIGHT);
-                        break;
-                    case ColitionsManager.RIGHT:
-                        e.setDir(false, p.LEFT);
-                        break;
-                }
-            }
-        }
-        for (int i = 0; i < enemyList.size(); i++) {
-            if(e.intersects(enemyList.get(i)) && e != enemyList.get(i) && enemyList.get(i).isActive()){
-                switch(cmE.checkCol(e, enemyList.get(i))){
-                    case ColitionsManager.UP:
-                        e.setDir(false, p.DOWN);
-                        break;
-                    case ColitionsManager.DOWN:
-                        e.setDir(false, p.UP);
-                        break;
-                    case ColitionsManager.LEFT:
-                        e.setDir(false, p.RIGHT);
-                        break;
-                    case ColitionsManager.RIGHT:
-                        e.setDir(false, p.LEFT);
-                        break;
-                }
-            }
-        }
-    }
+
     private void checkFutureMovementCol(boolean Vertical,boolean Horizontal){
         int auxC = 0;
+        int auxE = 0;
+        int padd = 5;
         Rectangle auxR;
         if(!Vertical && !Horizontal){
             //UP
-            for (int i = 0; i < paredes.size(); i++) {
-                auxR = paredes.get(i);
-                if(cmP.checkFutureCol(p.getX(),p.getY() - p.getVel(),p.getWidth(),p.getHeight(),auxR)){
+            for (int i = 0; i < walls.size(); i++) {
+                auxR = walls.get(i);
+                if(cmP.checkFutureCol(p.getX() + padd,p.getY() - p.getVel(),p.getWidth() - padd,p.getVel(),auxR)){
                    auxC++; 
                     //p.setY(p.getY() - p.getVel());
                 }
             }
-            if(auxC == 0) p.setY(p.getY() - p.getVel());
+            for (int i = 0; i < enemyList.size(); i++) {
+                if(cmE.checkFutureCol(p.getX() + padd,p.getY() - p.getVel(),p.getWidth() - padd,p.getVel(),enemyList.get(i))){
+                    auxE++;
+                }
+            }
+            if(auxC == 0 && auxE == 0) p.setY(p.getY() - p.getVel());
         }
         auxC = 0;
+        auxE = 0;
         if(Vertical && !Horizontal){
             //DOWN
-            for (int i = 0; i < paredes.size(); i++) {
-                auxR = paredes.get(i);
-                if(cmP.checkFutureCol(p.getX(),p.getY() + p.getVel(),p.getWidth(),p.getHeight(),auxR)){
+            for (int i = 0; i < walls.size(); i++) {
+                auxR = walls.get(i);
+                if(cmP.checkFutureCol(p.getX() + padd,p.getY() + p.getHeight(),p.getWidth() - padd,p.getVel(),auxR)){
                     auxC++;
                 }
             }
-            if(auxC == 0) p.setY(p.getY() + p.getVel());
+            for (int i = 0; i < enemyList.size(); i++) {
+                if(cmE.checkFutureCol(p.getX() + padd,p.getY() + p.getHeight(),p.getWidth() - padd,p.getVel(),enemyList.get(i))){
+                    auxE++;
+                }
+            }
+            if(auxC == 0 && auxE == 0) p.setY(p.getY() + p.getVel());
         }
         auxC = 0;
+        auxE = 0;
         if(!Vertical && Horizontal){
             //LEFT
-            for (int i = 0; i < paredes.size(); i++) {
-                auxR = paredes.get(i);
-                if(cmP.checkFutureCol(p.getX() - p.getVel(),p.getY(),p.getWidth(),p.getHeight(),auxR)){
+            for (int i = 0; i < walls.size(); i++) {
+                auxR = walls.get(i);
+                if(cmP.checkFutureCol(p.getX() - p.getVel(),p.getY() + padd,p.getVel(),p.getHeight() - padd,auxR)){
                     auxC++;
                 }
             }
-            if(auxC == 0) p.setX(p.getX() - p.getVel());
+            for (int i = 0; i < enemyList.size(); i++) {
+                if(cmE.checkFutureCol(p.getX() - p.getVel(),p.getY() + padd,p.getVel(),p.getHeight() - padd,enemyList.get(i))){
+                    auxE++;
+                }
+            }
+            if(auxC == 0 && auxE == 0) p.setX(p.getX() - p.getVel());
         }
         auxC = 0;
+        auxE = 0;
         if(Vertical && Horizontal){
             //RIGHT
-            for (int i = 0; i < paredes.size(); i++) {
-                auxR = paredes.get(i);
-                if(cmP.checkFutureCol(p.getX() + p.getVel(),p.getY(),p.getWidth(),p.getHeight(),auxR)){
+            for (int i = 0; i < walls.size(); i++) {
+                auxR = walls.get(i);
+                if(cmP.checkFutureCol(p.getX() + p.getWidth(),p.getY() + padd,p.getVel(),p.getHeight() - padd,auxR)){
                     auxC++;
                 }
             }
-            if(auxC == 0) p.setX(p.getX() + p.getVel());
+            for (int i = 0; i < enemyList.size(); i++) {
+                if(cmE.checkFutureCol(p.getX() + p.getWidth(),p.getY() + padd,p.getVel(),p.getHeight() - padd,enemyList.get(i))){
+                    auxE++;
+                }
+            }
+            if(auxC == 0 && auxE == 0) p.setX(p.getX() + p.getVel());
         }
     }
     private void InputManager(int delta){
@@ -339,11 +347,19 @@ public class Game extends BasicGameState{
         if(input.isKeyDown(Input.KEY_D)){
             this.checkFutureMovementCol(true, true);
         }
+        if(input.isKeyPressed(Input.KEY_Q)){
+            p.previousGun();
+        }
+        if(input.isKeyPressed(Input.KEY_E)){
+            p.nextGun();
+        }
         //F's
         
-        if(input.isKeyDown(Input.KEY_F1)){
+        if(input.isKeyPressed(Input.KEY_F1)){
             for (int i = 0; i < enemyList.size(); i++) {
-                enemyList.get(i).follow(p);
+                Enemy e = enemyList.get(i);
+                e.follow(p,tmap.getPathFinder().findPath(p,(int)(e.getX()/32),(int)(e.getY()/32),
+                         (int)(p.getX()/32), (int)(p.getY()/32)));
             }
         }
         if(input.isKeyPressed(Input.KEY_F5)){
@@ -355,27 +371,70 @@ public class Game extends BasicGameState{
         }
         //
         //Mouse Inputs
-        if(Mouse.isButtonDown(0) && auxMb1 == 0){
-            //CLICK IZQUIERDO
-            for (int i = 0; i < auxGunSize; i++) {
-                if(auxGun.getBullets().get(i).isReady()){
-                    p.shot((int)p.getX(),(int)p.getY(),(int)(mx+camX),(int)(my+camY));
-                    break;
+        this.gunManager(delta);
+        //Mouse Wheel Inputs
+    }
+    private void gunManager(int delta){
+        Gun playerGun = p.getGun();
+        int GunSize = playerGun.getChargerSize();
+        if(playerGun.isAutomatic()){
+            if(Mouse.isButtonDown(0) && auxMb1 == 0){
+                //CLICK IZQUIERDO
+                for (int i = 0; i < playerGun.getChargerSize(); i++) {
+                    if(playerGun.getBullets().get(i).isReady()){
+                        p.shot((int)p.getX(),(int)p.getY(),(int)(mx+camX),(int)(my+camY));
+                        break;
+                    }
                 }
+                auxMb1 = (int) playerGun.getShotSpeed();
             }
-            auxMb1 = shotDelay;
+            if(Mouse.isButtonDown(1) && auxMb2 == 0){
+                //CLICK DERECHO
+                auxMb2 = (int) playerGun.getShotSpeed();
+            }
+            if(auxMb1 > 0){
+                auxMb1 -= delta;
+                if(auxMb1 < 0) auxMb1 = 0;
+            }
+            if(auxMb2 > 0){
+                auxMb2 -= delta;
+                if(auxMb2 < 0) auxMb2 = 0;
+            }
+        }else{
+            if(Mouse.isButtonDown(0) && auxMb1 == 0 && auxMbLeft){
+                //CLICK IZQUIERDO
+                auxMbLeft = false;
+                for (int i = 0; i < GunSize; i++) {
+                    if(playerGun.getBullets().get(i).isReady()){
+                        p.shot((int)p.getX(),(int)p.getY(),(int)(mx+camX),(int)(my+camY));
+                        break;
+                    }
+                }
+                auxMb1 = (int) playerGun.getShotSpeed();
+            }
+            if(Mouse.isButtonDown(1) && auxMb2 == 0 && auxMbRight){
+                //CLICK DERECHO
+                auxMbRight = false;
+                auxMb2 = (int) playerGun.getShotSpeed();
+            }
+            if(auxMb1 > 0){
+                auxMb1 -= delta;
+                if(auxMb1 < 0) auxMb1 = 0;
+            }
+            if(auxMb2 > 0){
+                auxMb2 -= delta;
+                if(auxMb2 < 0) auxMb2 = 0;
+            }
         }
-        if(Mouse.isButtonDown(1) && auxMb2 == 0){
-            //CLICK DERECHO
-            auxMb2 = shotDelay;
-        }
-        if(auxMb1 > 0){
-            auxMb1 -= delta;
-            if(auxMb1 < 0) auxMb1 = 0;
-        }
-        if(auxMb2 > 0){
-            auxMb2 -= delta;
-            if(auxMb2 < 0) auxMb2 = 0;
+    }
+    @Override
+    public void mouseReleased(int button, int x, int y) {
+        if(!p.getGun().isAutomatic()){
+            if(button == 0){
+                auxMbLeft = true;
+            }else if(button == 1){
+                auxMbRight = true;
+            }
         }
     }
 }

@@ -15,43 +15,46 @@ import org.newdawn.slick.Sound;
  */
 public class Gun {
     
+    public static final int NINEMM = 0;
+    public static final int UZI = 1;
+    public static final int AWP = 2;
+    
     private final int ID;
     private final int chargerSize;
     private final float shotSpeedConstant;
     private final ArrayList<Bullet> arrB;
-    private final int reloadConstant = 1000;
+    private final int reloadConstant;
     private int totalBullets;
     private int currentBullets;
     private boolean reloading;
     private float reloadDelay;
+    private final boolean automatic;
     private final Sound shotSound;
     private final Sound reloadSound;
     private final Sound emptySound;
     
-    public Gun(String ShotSoundRef,int chargerSize,float shotSpeed,int ID) throws SlickException{
+    public Gun(String ShotSoundRef,int chargerSize,int totalBullets,float shotSpeed,int bulletSpeed,int Dmg,int reloadConst,boolean automatic,int ID) throws SlickException{
         this.ID = ID;
         shotSound = new Sound(ShotSoundRef);
         reloadSound = new Sound("Assets/TestAssets/9mmLoad.ogg");
         emptySound = new Sound("Assets/TestAssets/9mmEmpty.ogg");
         shotSpeedConstant = shotSpeed;
         this.chargerSize = chargerSize;
+        this.totalBullets = totalBullets;
+        this.currentBullets = chargerSize;
+        this.automatic = automatic;
         reloading = false;
+        reloadConstant = reloadConst;
         reloadDelay = reloadConstant;
-        this.init();
         arrB = new ArrayList<>();
         for (int i = 0; i < chargerSize; i++) {
-            arrB.add(new Bullet(-500, 0, 2, 2, shotSpeed, ID));
+            arrB.add(new Bullet(-500, 0, 2, 2, bulletSpeed,Dmg, ID));
         }
-    }
-    
-    private void init(){
-        totalBullets = chargerSize;
-        currentBullets = chargerSize;
     }
     public boolean reload(){
         if(totalBullets > 0 && currentBullets != chargerSize){
             reloading = true;
-            reloadSound.play(1,0.9f);        
+            reloadSound.play(1,0.9f);
             while(currentBullets < chargerSize){
                 if(totalBullets > 0){
                     currentBullets++;
@@ -109,6 +112,9 @@ public class Gun {
     public ArrayList<Bullet> getBullets(){
         return arrB;
     }    
+    public boolean isAutomatic(){
+        return automatic;
+    }
     public int getID(){
         return ID;
     }

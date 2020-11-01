@@ -5,6 +5,7 @@
  */
 package pkg2dshotgame;
 
+import java.util.ArrayList;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
@@ -38,6 +39,40 @@ public class ColitionsManager {
         rectA = new Rectangle(xp,yp,wp,hp);
         rectB = rb;
         return rectB.intersects(rectA);
+    }
+    public boolean checkFutureCol(float xf,float yf,int padd,int dir,Player p,Enemy enemy,ArrayList<Enemy> eList){
+        int auxE = 0;
+        Rectangle auxR;
+        switch(dir){
+            case Enemy.UP:
+                auxR = new Rectangle(enemy.getX() + padd,enemy.getY() - enemy.getVel(),
+                                               enemy.getWidth() - padd,enemy.getVel());
+                break;
+            case Enemy.DOWN:
+                auxR = new Rectangle(enemy.getX() + padd,enemy.getY() + enemy.getHeight(),
+                                               enemy.getWidth() - padd,enemy.getVel());
+                break;
+            case Enemy.LEFT:
+                auxR = new Rectangle(enemy.getX() - enemy.getVel(),enemy.getY() + padd,
+                                               enemy.getVel(),enemy.getHeight() - padd);
+                break;
+            case Enemy.RIGHT:
+                auxR = new Rectangle(enemy.getX() + enemy.getWidth(),enemy.getY() + padd,
+                                               enemy.getVel(),enemy.getHeight() - padd);
+                break;
+            default:
+                auxR = enemy;
+                System.out.println("Error");
+                break;
+        }
+        for(Enemy e: eList){
+            if(!e.equals(enemy)){
+                if(auxR.intersects(e) && e.isActive()){
+                    auxE++;
+                }
+            }
+        }
+        return (!auxR.intersects(p) && auxE == 0);
     }
     public int checkCol(Shape a,Shape b){
         float ax1,ax2,ay1,ay2,bx1,bx2,by1,by2;

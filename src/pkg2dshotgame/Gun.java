@@ -33,11 +33,11 @@ public class Gun {
     private final Sound reloadSound;
     private final Sound emptySound;
     
-    public Gun(String ShotSoundRef,int chargerSize,int totalBullets,float shotSpeed,int bulletSpeed,int Dmg,int reloadConst,boolean automatic,int ID) throws SlickException{
+    public Gun(String shotSoundRef,String reloadSoundRef,String emptySoundRef,int chargerSize,int totalBullets,float shotSpeed,int bulletSpeed,int Dmg,int reloadConst,boolean automatic,int ID) throws SlickException{
         this.ID = ID;
-        shotSound = new Sound(ShotSoundRef);
-        reloadSound = new Sound("Assets/TestAssets/9mmLoad.ogg");
-        emptySound = new Sound("Assets/TestAssets/9mmEmpty.ogg");
+        shotSound = new Sound(shotSoundRef);
+        reloadSound = new Sound(reloadSoundRef);
+        emptySound = new Sound(emptySoundRef);
         shotSpeedConstant = shotSpeed;
         this.chargerSize = chargerSize;
         this.totalBullets = totalBullets;

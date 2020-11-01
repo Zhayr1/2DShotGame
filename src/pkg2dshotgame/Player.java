@@ -32,7 +32,6 @@ public class Player extends Entity implements Mover{
     private boolean isInv;
     private int score;
     private final Image img;
-    private final Image aimImg;
     //Variables de movimiento
     private boolean up,down,left,right;
     
@@ -40,11 +39,7 @@ public class Player extends Entity implements Mover{
         super(x, y, width, height, ID);
         up = down = left = right = false;
         img = new Image("Assets/Player.png");
-        aimImg = new Image("Assets/PlayerAim.png");
         int auxw,auxh;
-        auxw = aimImg.getWidth();
-        auxh = aimImg.getHeight();
-        aimImg.setCenterOfRotation(auxw/2, auxh/2);
         VEL = 3;
         health = 10;
         invTime = 500;
@@ -52,9 +47,9 @@ public class Player extends Entity implements Mover{
         score = 0;
         currentGun = 0;
         gunList = new ArrayList();
-        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",15,45,250,1,2,500,false,Gun.NINEMM));
-        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",150,300,100,1,1,750,true,Gun.UZI));
-        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg",7,21,500,2,5,1000,false,Gun.AWP));
+        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg","Assets/TestAssets/9mmLoad.ogg","Assets/TestAssets/9mmEmpty.ogg",15,45,250,1,2,500,false,Gun.NINEMM));
+        gunList.add(new Gun("Assets/TestAssets/9mmFire.ogg","Assets/TestAssets/9mmLoad.ogg","Assets/TestAssets/9mmEmpty.ogg",150,300,100,1,1,750,true,Gun.UZI));
+        gunList.add(new Gun("Assets/TestAssets/RifleFire.ogg","Assets/TestAssets/RifleLoad.ogg","Assets/TestAssets/RifleEmpty.ogg",7,21,500,2,5,1000,false,Gun.AWP));
     }
     public void updateMovement(int mx,int my,int delta){
         if(up)    super.setY(y - VEL);
@@ -67,7 +62,6 @@ public class Player extends Entity implements Mover{
         g.setColor(Color.white);
         //g.fill(this);
         img.draw(super.getX(),super.getY());
-        aimImg.draw(super.getX(),super.getY());
     }
     public void updateTimers(int delta){
         if(isInv && invTime > 0){
@@ -120,7 +114,6 @@ public class Player extends Entity implements Mover{
         }else{
             currentGun++;
         }
-        System.out.println("CurrentGun: "+currentGun);
     }
     public void previousGun(){
         if(currentGun - 1 < 0){
@@ -128,7 +121,9 @@ public class Player extends Entity implements Mover{
         }else{
             currentGun--;
         }
-        System.out.println("CurrentGun: "+currentGun);
+    }
+    public int getCurrentGun(){
+        return currentGun;
     }
     public int getHealth(){
         return health;

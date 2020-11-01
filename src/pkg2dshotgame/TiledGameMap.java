@@ -66,6 +66,25 @@ public class TiledGameMap implements TileBasedMap{
             tileBasedMap[auxX][auxY] = 1;
         }
     }
+    public void updateMap(ArrayList<Enemy> eList ){
+        for(int i = 0; i < mapWidth; i++){
+            for(int j = 0; j < mapHeight; j++){
+                if(tileBasedMap[i][j] != 1){
+                    tileBasedMap[i][j] = 0;
+                }
+            }
+        }
+        for(Enemy e: eList){
+            if(e.isActive()){
+                int posX,posY;
+                posX = (int) e.getX();
+                posX /= 32;
+                posY = (int) e.getY();
+                posY /= 32;
+                tileBasedMap[posX][posY] = 2;
+            }
+        }
+    }
     public void printMatrixMap(){
         for(int i = 0; i < mapHeight; i++){
             for (int j = 0; j < mapWidth; j++) {
@@ -90,8 +109,7 @@ public class TiledGameMap implements TileBasedMap{
 
     @Override
     public boolean blocked(PathFindingContext pfc, int tx, int ty) {
-        //return boundaries.stream().filter((boundarie) -> (boundarie.getX() >= tx && boundarie.getX()+boundarie.getWidth() <= tx+mapTileWidth)).anyMatch((boundarie) -> (boundarie.getY() >= ty && boundarie.getY()+boundarie.getHeight() <= tx+mapTileHeight));
-        return tileBasedMap[(int)(tx)][(int)(ty)] == 1;
+        return tileBasedMap[(int)(tx)][(int)(ty)] != 0;
     }
 
     @Override

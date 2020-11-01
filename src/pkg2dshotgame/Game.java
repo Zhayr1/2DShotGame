@@ -10,6 +10,7 @@ import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
@@ -50,6 +51,9 @@ public class Game extends BasicGameState{
     private int shotDelay;
     //Player
     private Player p;
+    private Image[] gunsHolders;
+    private Image infoPanel;
+    private Image scoreBanner;
     //Enemys
     private ArrayList<Enemy> enemyList;
     //AStar
@@ -72,8 +76,8 @@ public class Game extends BasicGameState{
         enemyList = new ArrayList<>();
         gameC = gc;
         this.initCam();
-        for (int i = 0; i < 1; i++) {
-            enemyList.add(new Enemy(100 * (i+1),100 * (i+1),32,32,3));
+        for (int i = 0; i < 5; i++) {
+            enemyList.add(new Enemy( 2*32 * (i+1),25*32,32,32,3));
         }
         input = gc.getInput();
         globalTime = globalScore = globalWave = 0;
@@ -98,6 +102,17 @@ public class Game extends BasicGameState{
         roof = new ArrayList();
         roof.add(new Rectangle(17*32,32,6*32,7*32));
         roof.add(new Rectangle(32,14*32,6*32,7*32));
+        gunsHolders = new Image[3];
+        gunsHolders[0] = new Image("Assets/GunHolder_9mm.png");
+        gunsHolders[0] = gunsHolders[0].getScaledCopy(0.35f);
+        gunsHolders[1] = new Image("Assets/GunHolder_Uzi.png");
+        gunsHolders[1] = gunsHolders[1].getScaledCopy(0.35f);
+        gunsHolders[2] = new Image("Assets/GunHolder_Awp.png");
+        gunsHolders[2] = gunsHolders[2].getScaledCopy(0.35f);
+        infoPanel = new Image("Assets/GunHolder.png");
+        infoPanel = infoPanel.getScaledCopy(0.35f);
+        scoreBanner = new Image("Assets/scoreBanner.png");
+        
         auxRoof = 0;
         inRoof = false;
         shotDelay = 30; // In MilliSeconds
@@ -140,7 +155,17 @@ public class Game extends BasicGameState{
         if(auxDebug){
             this.renderDebug(gc,g);
         }else{
-            this.renderHUD(g);
+            if(camX + mx >= camX + this.VIEWPORT_SIZE_X - gunsHolders[p.getCurrentGun()].getWidth()  - infoPanel.getWidth() && 
+               camX + mx <= camX + this.VIEWPORT_SIZE_X ){
+                if(camY + my >= camY + this.VIEWPORT_SIZE_Y - gunsHolders[p.getCurrentGun()].getHeight() && 
+                   camY + my <= camY + this.VIEWPORT_SIZE_Y ){
+                    this.renderHUD(g,0.3f);
+                }else{
+                    this.renderHUD(g,1f);
+                }
+            }else{
+                this.renderHUD(g,1f);
+            }
         }        
         if(Mouse.isInsideWindow()) g.fillOval(camX+mx - 5, camY+my - 5, 10, 10); // Mouse Point
     }
@@ -151,6 +176,7 @@ public class Game extends BasicGameState{
         this.updateMovements(i);
         this.updateEntityColitions();
         this.updateCameraOffSets();
+        tmap.updateMap(enemyList);
     }
     private void renderDebug(GameContainer gc,Graphics g){
         g.setColor(Color.yellow);
@@ -162,20 +188,29 @@ public class Game extends BasicGameState{
         //Figuras Geometricas y Lineas
     }
     private void renderEnemies(Graphics g){
-        for (int i = 0; i < enemyList.size(); i++) {
-            if(!enemyList.get(i).isActive()) {
-                enemyList.get(i).render(g);
-            }else{
-                enemyList.get(i).render(g);
-            }    
+        for(Enemy e: enemyList){
+            if(!e.isActive()){
+                e.render(g);
+            }
+        }
+        for(Enemy e: enemyList){
+            if(e.isActive()){
+                e.render(g);
+            }
         }
     }
-    private void renderHUD(Graphics g){
+    private void renderHUD(Graphics g,float alpha){
         g.setColor(Color.white);
-        String auxS = "Hp: "+p.getHealth()+"\nBalas: "+p.getGun().getCurrentBullets()+"/"+p.getGun().getTotalBullets()+
-                      "\nScore: "+p.getScore()+"\n";
-        auxS += "Wave: "+globalWave;
-        g.drawString(auxS, camX + 10, camY + 10);
+        String auxS = "Health: "+p.getHealth()+"\nBullets: "+p.getGun().getCurrentBullets()+"/"+p.getGun().getTotalBullets();
+        auxS += "\nScore: "+p.getScore();
+        gunsHolders[p.getCurrentGun()].setAlpha(alpha);
+        gunsHolders[p.getCurrentGun()].draw(camX + this.VIEWPORT_SIZE_X - gunsHolders[p.getCurrentGun()].getWidth(),camY + this.VIEWPORT_SIZE_Y - gunsHolders[p.getCurrentGun()].getHeight());
+        infoPanel.setAlpha(alpha);
+        infoPanel.draw(camX + this.VIEWPORT_SIZE_X - gunsHolders[p.getCurrentGun()].getWidth() - infoPanel.getWidth(),
+                       camY + this.VIEWPORT_SIZE_Y - gunsHolders[p.getCurrentGun()].getHeight());
+        g.drawString(auxS, camX + this.VIEWPORT_SIZE_X - gunsHolders[p.getCurrentGun()].getWidth() - infoPanel.getWidth() +10,
+                     camY + this.VIEWPORT_SIZE_Y - gunsHolders[p.getCurrentGun()].getHeight() + 10);
+        //scoreBanner.draw(camX + this.VIEWPORT_SIZE_X/2 - scoreBanner.getWidth()/3,camY + 10,400,40);
     }
     private void renderMap(Graphics g){
         map.getTiledMap().render(0, 0, 0);
@@ -200,7 +235,7 @@ public class Game extends BasicGameState{
         p.updateMovement((int)(mx+camX),(int)(my+camY),delta);
         //Enemies Movement
         for (int i = 0; i < enemyList.size(); i++) {
-            enemyList.get(i).updatePosition(delta,tmap,p);    
+            enemyList.get(i).updatePosition(delta,tmap,p,enemyList);    
         }
         //BulletsMovement
         for (int i = 0; i < p.getGun().getBullets().size(); i++) {
@@ -271,12 +306,13 @@ public class Game extends BasicGameState{
                 auxR = walls.get(i);
                 if(cmP.checkFutureCol(p.getX() + padd,p.getY() - p.getVel(),p.getWidth() - padd,p.getVel(),auxR)){
                    auxC++; 
-                    //p.setY(p.getY() - p.getVel());
                 }
             }
             for (int i = 0; i < enemyList.size(); i++) {
-                if(cmE.checkFutureCol(p.getX() + padd,p.getY() - p.getVel(),p.getWidth() - padd,p.getVel(),enemyList.get(i))){
-                    auxE++;
+                if(enemyList.get(i).isActive()){
+                    if(cmE.checkFutureCol(p.getX() + padd,p.getY() - p.getVel(),p.getWidth() - padd,p.getVel(),enemyList.get(i))){
+                        auxE++;
+                    }
                 }
             }
             if(auxC == 0 && auxE == 0) p.setY(p.getY() - p.getVel());
@@ -292,8 +328,10 @@ public class Game extends BasicGameState{
                 }
             }
             for (int i = 0; i < enemyList.size(); i++) {
-                if(cmE.checkFutureCol(p.getX() + padd,p.getY() + p.getHeight(),p.getWidth() - padd,p.getVel(),enemyList.get(i))){
-                    auxE++;
+                if(enemyList.get(i).isActive()){
+                    if(cmE.checkFutureCol(p.getX() + padd,p.getY() + p.getHeight(),p.getWidth() - padd,p.getVel(),enemyList.get(i))){
+                        auxE++;
+                    }
                 }
             }
             if(auxC == 0 && auxE == 0) p.setY(p.getY() + p.getVel());
@@ -309,8 +347,10 @@ public class Game extends BasicGameState{
                 }
             }
             for (int i = 0; i < enemyList.size(); i++) {
-                if(cmE.checkFutureCol(p.getX() - p.getVel(),p.getY() + padd,p.getVel(),p.getHeight() - padd,enemyList.get(i))){
-                    auxE++;
+                if(enemyList.get(i).isActive()){
+                    if(cmE.checkFutureCol(p.getX() - p.getVel(),p.getY() + padd,p.getVel(),p.getHeight() - padd,enemyList.get(i))){
+                        auxE++;
+                    }
                 }
             }
             if(auxC == 0 && auxE == 0) p.setX(p.getX() - p.getVel());
@@ -326,8 +366,10 @@ public class Game extends BasicGameState{
                 }
             }
             for (int i = 0; i < enemyList.size(); i++) {
-                if(cmE.checkFutureCol(p.getX() + p.getWidth(),p.getY() + padd,p.getVel(),p.getHeight() - padd,enemyList.get(i))){
-                    auxE++;
+                if(enemyList.get(i).isActive()){
+                    if(cmE.checkFutureCol(p.getX() + p.getWidth(),p.getY() + padd,p.getVel(),p.getHeight() - padd,enemyList.get(i))){
+                        auxE++;
+                    }
                 }
             }
             if(auxC == 0 && auxE == 0) p.setX(p.getX() + p.getVel());
@@ -359,7 +401,7 @@ public class Game extends BasicGameState{
             for (int i = 0; i < enemyList.size(); i++) {
                 Enemy e = enemyList.get(i);
                 e.follow(p,tmap.getPathFinder().findPath(p,(int)(e.getX()/32),(int)(e.getY()/32),
-                         (int)(p.getX()/32), (int)(p.getY()/32)));
+                         (int)(p.getX()/32), (int)(p.getY()/32)),enemyList);
             }
         }
         if(input.isKeyPressed(Input.KEY_F5)){

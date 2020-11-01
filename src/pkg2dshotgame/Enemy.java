@@ -5,6 +5,7 @@
  */
 package pkg2dshotgame;
 
+import java.util.ArrayList;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -14,6 +15,7 @@ import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.Path;
+import org.newdawn.slick.util.pathfinding.Path.Step;
 
 /**
  *
@@ -22,14 +24,15 @@ import org.newdawn.slick.util.pathfinding.Path;
 public class Enemy extends Entity implements Mover{
     
     //TEST
-    public final byte UP = 0;
-    public final byte DOWN = 1;
-    public final byte LEFT = 2;
-    public final byte RIGHT = 3;
-    public final byte VEL;
+    public static final int UP = 0;
+    public static final int DOWN = 1;
+    public static final int LEFT = 2;
+    public static final int RIGHT = 3;
+    public final int VEL;
     private int refreshRate; //In Milliseconds
     private final int refreshConstant = 1500;
     private int currentStep,auxEndPath;
+    private boolean nullPath;
     private Path path;
     private boolean pathEnded;
     private final Sound enemyHit;
@@ -51,6 +54,7 @@ public class Enemy extends Entity implements Mover{
         auxEndPath = 0;
         path = new Path();
         pathEnded = false;
+        nullPath = false;
         enemyHit = new Sound("Assets/TestAssets/zombieHit.ogg");
         //TEST
         refreshRate = refreshConstant;
@@ -67,14 +71,16 @@ public class Enemy extends Entity implements Mover{
     //\TEST
     private void updateMovement(){
         if(targetPlayer != null){
-            if(this.intersects(targetPlayer)){
+            if(this.intersects(targetPlayer) && this.isActive()){
                 targetPlayer.hit(1);
-                System.out.println("hit");
             }
         }
     }    
     //\TEST
-    public void follow(Player p,Path path){
+    public void follow(Player p,Path path,ArrayList<Enemy> eList){
+        for(Enemy e: eList){
+            
+        }
         if(health > 0 && !p.intersects(this)){
             active = true;
             targetPlayer = p;
@@ -82,7 +88,13 @@ public class Enemy extends Entity implements Mover{
             this.path = path;
             currentStep = 1;
             pathEnded = false;
-            auxEndPath = path.getLength();
+            nullPath = false;
+            try{
+                auxEndPath = path.getLength();
+            }catch(NullPointerException e){
+                nullPath = true;
+                auxEndPath = 1;
+            }
         }
     }
     public void hit(int dmg){
@@ -92,36 +104,37 @@ public class Enemy extends Entity implements Mover{
             if(health <= 0) targetPlayer.addScore(1);
         }
     }
-    public void updatePosition(int delta,TileMapAStar tmap,Player p){
+    public void updatePosition(int delta,TileMapAStar tmap,Player p,ArrayList eList){
         refreshRate -= delta;
         this.updateMovement();
-        if(active && health > 0 && !this.intersects(p)) move(super.getX()/32,super.getY()/32,path.getStep(currentStep).getX(),path.getStep(currentStep).getY(),p);
+        if(active && health > 0 && !this.intersects(p) && !nullPath) move(super.getX()/32,super.getY()/32,path.getStep(currentStep).getX(),path.getStep(currentStep).getY(),p,eList);
         if(active && health > 0 && (refreshRate <= 0 || pathEnded) ){
             refreshRate = this.refreshConstant;
             if(pathEnded || ( oldP_Pos.getX() != p.getX() || oldP_Pos.getY() != p.getY()) ) {
                 this.follow(targetPlayer,tmap.getPathFinder().findPath(targetPlayer,(int)(super.getX()/32),
-                (int)(super.getY()/32),(int)(targetPlayer.getX()/32), (int)(targetPlayer.getY()/32)));
+                (int)(super.getY()/32),(int)(targetPlayer.getX()/32), (int)(targetPlayer.getY()/32)),eList);
             }
         }else if(health <= 0){
             active = false;
         }
     }
-    public void move(float xi,float yi,float xf,float yf,Player p){
+    public void move(float xi,float yi,float xf,float yf,Player p,ArrayList<Enemy> eList){
+        int padd = 12;
         if(xi > xf){
             //LEFT
-            if(!cm.checkFutureCol(xf, yf, 32, 32, p)) super.setX(super.getX() - VEL);
+            if(cm.checkFutureCol(xf,yf,padd,Enemy.LEFT,p,this,eList)) super.setX(super.getX() - VEL);
         }
         if(xi < xf){
             //RIGHT
-            if(!cm.checkFutureCol(xf, yf, 32, 32, p)) super.setX(super.getX() + VEL);
+            if(cm.checkFutureCol(xf,yf,padd,Enemy.RIGHT,p,this,eList)) super.setX(super.getX() + VEL);
         }
         if(yi > yf){
             //UP
-            if(!cm.checkFutureCol(xf, yf, 32, 32, p)) super.setY(super.getY() - VEL);
+            if(cm.checkFutureCol(xf,yf,padd,Enemy.UP,p,this,eList)) super.setY(super.getY() - VEL);
         }
         if(yi < yf){
             //DOWN
-            if(!cm.checkFutureCol(xf, yf, 32, 32, p)) super.setY(super.getY() + VEL);
+            if(cm.checkFutureCol(xf,yf,padd,Enemy.DOWN,p,this,eList)) super.setY(super.getY() + VEL);
         }
         if(xi == xf && yi == yf){
             if((currentStep) == auxEndPath - 1){
@@ -136,12 +149,11 @@ public class Enemy extends Entity implements Mover{
         }else{
             deathimg.draw(super.getX(),super.getY());
         }
-        /*for (int i = 0; i < path.getLength(); i++) {
-            g.setColor(Color.yellow);
-            g.draw(new Rectangle(path.getX(i)*32,path.getY(i)*32,32,32));
-        }*/
     }    
     public boolean isActive(){
         return active;
+    }
+    public int getVel(){
+        return VEL;
     }
 }

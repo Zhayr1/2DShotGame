@@ -1,0 +1,3 @@
+W A S D para moverse, click para disparar.
+R para recargar E y Q para cambiar de armas. 
+F1 para activar los enemigos y F5 para modo debug
